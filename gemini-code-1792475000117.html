@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Khu Vườn Thương Nhớ 20/10 — Gửi Ngàn Hoa Dịu Dàng</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    * {
+      box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: var(--font-sans);
+    }
+    .font-editorial {
+      font-family: var(--font-serif);
+    }
+    /* Glassmorphism & Card animations */
+    .glass-pill {
+      background: rgba(255, 255, 255, 0.58);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      box-shadow: 0 8px 32px rgba(180, 90, 120, 0.14);
+    }
+    .theme-night .glass-pill {
+      background: rgba(25, 22, 48, 0.65);
+      border: 1px solid rgba(255, 210, 235, 0.25);
+      color: #fdf2f8;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    }
+    .letter-card {
+      background: linear-gradient(155deg, rgba(255, 252, 253, 0.88) 0%, rgba(255, 240, 246, 0.82) 100%);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1.5px solid rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 25px 60px -15px rgba(168, 62, 102, 0.28),
+        0 0 0 1px rgba(244, 162, 184, 0.3) inset,
+        0 12px 28px rgba(255, 255, 255, 0.65) inset;
+      transition: all 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .theme-night .letter-card {
+      background: linear-gradient(155deg, rgba(30, 24, 54, 0.88) 0%, rgba(46, 26, 58, 0.84) 100%);
+      border: 1.5px solid rgba(255, 192, 220, 0.32);
+      box-shadow:
+        0 25px 60px -15px rgba(0, 0, 0, 0.65),
+        0 0 30px rgba(236, 72, 153, 0.18),
+        0 0 0 1px rgba(255, 210, 230, 0.15) inset;
+      color: #fce7f3;
+    }
+    .wax-seal {
+      background: radial-gradient(circle at 32% 30%, #fb7185, #e11d48 58%, #9f1239 100%);
+      box-shadow:
+        0 6px 16px rgba(190, 18, 60, 0.4),
+        0 2px 4px rgba(255, 255, 255, 0.45) inset,
+        0 -2px 5px rgba(100, 10, 30, 0.5) inset;
+    }
+    @keyframes floatSlow {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-7px); }
+    }
+    @keyframes pulseRing {
+      0% { transform: scale(0.92); opacity: 0.75; }
+      70% { transform: scale(1.25); opacity: 0; }
+      100% { transform: scale(1.25); opacity: 0; }
+    }
+    .animate-float {
+      animation: floatSlow 3.8s ease-in-out infinite;
+    }
+    .pulse-indicator::before {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border-radius: 9999px;
+      border: 2px solid rgba(244, 114, 182, 0.55);
+      animation: pulseRing 2.2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+      pointer-events: none;
+    }
+    /* Custom Scrollbar for letter body on small screens */
+    .custom-scroll::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-scroll::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scroll::-webkit-scrollbar-thumb {
+      background: rgba(236, 72, 153, 0.28);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="relative w-full h-full select-none overflow-hidden">
+
+  <!-- Interactive Garden Canvas -->
+  <canvas id="gardenCanvas" class="block w-full h-full cursor-pointer"></canvas>
+
+  <!-- Top Navigation / Atmosphere Bar -->
+  <header class="fixed top-0 left-0 right-0 z-30 flex items-center justify-between px-4 py-3 sm:px-7 sm:py-5 pointer-events-none">
+    <!-- Brand / Poetic Subtitle -->
+    <div id="topBrandText" class="glass-pill pointer-events-auto px-4 py-2 rounded-full flex items-center gap-2.5 transition-all duration-500">
+      <span class="inline-block w-2.5 h-2.5 rounded-full bg-rose-400 animate-ping"></span>
+      <span class="font-editorial italic text-base sm:text-lg font-semibold tracking-wide text-rose-950 dark:text-pink-100" id="headerTagline">
+        Dành tặng bạn, cả một bầu trời thương nhớ.
+      </span>
+    </div>
+
+    <!-- Top Right Controls: Theme Switcher, Customize, Audio -->
+    <div class="flex items-center gap-2 pointer-events-auto">
+      <!-- Theme Switcher Button -->
+      <button id="themeCycleBtn" type="button" title="Đổi khung cảnh bầu trời"
+        class="glass-pill px-3.5 py-2 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-transform text-rose-900">
+        <span id="themeIcon">🌙</span>
+        <span id="themeLabel" class="hidden sm:inline">Đêm Đom Đóm Tinh Tú</span>
+      </button>
+
+      <!-- Personalize Wish Button -->
+      <button id="openCustomizeBtn" type="button" title="Tùy chỉnh lời chúc 20/10"
+        class="glass-pill px-3.5 py-2 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1.5 hover:scale-105 active:scale-95 transition-transform text-rose-900">
+        <span>✍️</span>
+        <span class="hidden md:inline">Viết lời chúc</span>
+      </button>
+
+      <!-- Sound Toggle Button -->
+      <button id="audioToggleBtn" type="button" title="Bật / Tắt giai điệu hộp nhạc"
+        class="glass-pill w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center hover:scale-105 active:scale-95 transition-transform text-rose-900">
+        <span id="audioIcon" class="text-base">🎵</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Stage 1 Intro Prompt (Above the single hero flower) -->
+  <div id="introPrompt" class="fixed inset-x-0 top-[14%] sm:top-[16%] z-20 flex flex-col items-center text-center px-4 pointer-events-none transition-all duration-700">
+    <span class="px-3.5 py-1 rounded-full text-xs uppercase tracking-[0.22em] font-semibold bg-white/50 text-rose-700 backdrop-blur-md mb-3 shadow-sm border border-white/60">
+      Món quà nhỏ ngày 20 • 10
+    </span>
+    <h1 id="introTitle" class="font-editorial italic font-semibold text-3xl sm:text-5xl md:text-6xl text-rose-950 drop-shadow-sm tracking-tight mb-2.5 animate-float">
+      Từ một đóa hoa dịu dàng...
+    </h1>
+    <p id="introSubtitle" class="text-sm sm:text-base text-rose-900/85 max-w-md font-medium bg-white/40 backdrop-blur-sm px-4 py-1.5 rounded-full border border-white/50 shadow-sm">
+      ✨ Chạm nhẹ vào bông hoa để đánh thức điều kỳ diệu đang chờ bạn
+    </p>
+  </div>
+
+  <!-- Stage 2 Blooming Status Subtitle (Bottom center while blooming) -->
+  <div id="bloomStatusBanner" class="fixed inset-x-0 bottom-8 z-20 flex flex-col items-center justify-center px-4 pointer-events-none opacity-0 translate-y-4 transition-all duration-700">
+    <div class="glass-pill px-5 py-2.5 rounded-full flex items-center gap-2.5 text-sm sm:text-base font-medium text-rose-950">
+      <span>🌸</span>
+      <span id="bloomStatusText" class="font-editorial italic text-lg sm:text-xl font-semibold">
+        Từ một nhành hoa nhỏ, cả khu vườn rực rỡ đang thức giấc vì bạn...
+      </span>
+    </div>
+  </div>
+
+  <!-- Stage 3 Poetic 20/10 Greeting Letter Modal -->
+  <div id="letterOverlay" class="fixed inset-0 z-40 flex items-center justify-center p-4 sm:p-6 pointer-events-none opacity-0 scale-95 transition-all duration-700">
+    <div id="letterCardContainer" class="letter-card relative w-full max-w-lg rounded-[2rem] p-6 sm:p-9 text-center flex flex-col items-center max-h-[86vh]">
+      
+      <!-- Decorative Corner Pressed Botanical SVG Left -->
+      <svg class="absolute top-3 left-3 w-12 h-12 text-rose-400/40 pointer-events-none" viewBox="0 0 64 64" fill="none">
+        <path d="M8 56C14 34 30 16 54 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M22 36C16 28 18 18 26 16C28 24 26 32 22 36Z" fill="currentColor"/>
+        <path d="M36 24C32 16 36 8 44 8C44 16 40 22 36 24Z" fill="currentColor"/>
+        <path d="M28 42C36 38 44 42 44 50C36 50 30 46 28 42Z" fill="currentColor"/>
+      </svg>
+      <!-- Decorative Corner Pressed Botanical SVG Right -->
+      <svg class="absolute top-3 right-3 w-12 h-12 text-rose-400/40 pointer-events-none transform scale-x-[-1]" viewBox="0 0 64 64" fill="none">
+        <path d="M8 56C14 34 30 16 54 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M22 36C16 28 18 18 26 16C28 24 26 32 22 36Z" fill="currentColor"/>
+        <path d="M36 24C32 16 36 8 44 8C44 16 40 22 36 24Z" fill="currentColor"/>
+        <path d="M28 42C36 38 44 42 44 50C36 50 30 46 28 42Z" fill="currentColor"/>
+      </svg>
+
+      <!-- Wax Seal 20/10 Emblem -->
+      <div class="wax-seal w-14 h-14 rounded-full flex flex-col items-center justify-center text-white mb-3 shrink-0 border-2 border-rose-200/60">
+        <span class="text-[10px] uppercase tracking-widest opacity-90 leading-none">Tháng 10</span>
+        <span class="font-editorial font-bold text-lg leading-tight">20•10</span>
+      </div>
+
+      <!-- Greeting Recipient -->
+      <p id="cardGreeting" class="font-editorial italic text-lg sm:text-xl text-rose-600 dark:text-pink-300 font-semibold mb-1">
+        Gửi tới Hà Vi
+      </p>
+
+      <!-- Main Editorial Headline -->
+      <h2 id="cardHeadline" class="font-editorial font-bold text-2xl sm:text-4xl text-rose-950 dark:text-white leading-tight mb-4">
+        Mong những điều dịu dàng nhất luôn nở rộ bên cậu.
+      </h2>
+
+      <!-- Divider -->
+      <div class="w-24 h-[1.5px] bg-gradient-to-r from-transparent via-rose-400/70 to-transparent mb-4 shrink-0"></div>
+
+      <!-- Scrollable Letter Paragraphs -->
+      <div class="custom-scroll overflow-y-auto px-1 sm:px-3 space-y-3.5 text-sm sm:text-[15.5px] leading-relaxed text-rose-950/85 dark:text-pink-100/90 font-normal">
+        <p id="cardPara1">
+          Một đóa hoa nhỏ có thể làm bừng sáng một góc trời, còn nụ cười của bạn lại khiến cả thế giới này trở nên ấm áp và dịu dàng hơn biết bao.
+        </p>
+        <p id="cardPara2">
+          Nhân ngày Phụ nữ Việt Nam 20/10, chúc cậu luôn được yêu thương trọn vẹn, được nâng niu như những cánh hoa sớm mai và luôn giữ trong tim ngọn lửa rạng rỡ. Mong cậu đủ bình yên để mỉm cười trước những điều giản dị, và đủ kiêu hãnh để theo đuổi mọi giấc mơ của riêng mình.
+        </p>
+        <p id="cardPara3">
+          Hôm nay và cả vạn ngày sau, hãy cứ tỏa hương theo cách độc nhất của chính cậu nhé!
+        </p>
+      </div>
+
+      <!-- Sign-off -->
+      <div class="mt-5 mb-5 shrink-0">
+        <p id="cardSignoff" class="font-editorial italic font-semibold text-xl sm:text-2xl text-rose-600 dark:text-pink-300">
+          Gửi ngàn lời chúc tới với bạn :333 Hà Nam
+        </p>
+      </div>
+
+      <!-- Action Buttons inside Card -->
+      <div class="flex flex-wrap items-center justify-center gap-3 w-full shrink-0">
+        <button id="admireGardenBtn" type="button"
+          class="pulse-indicator relative px-6 py-2.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold text-sm sm:text-base shadow-lg shadow-rose-500/30 hover:brightness-110 active:scale-95 transition-all">
+          🌷 Ngắm vườn hoa rực rỡ
+        </button>
+        <button id="sprinklePetalsBtn" type="button"
+          class="px-4 py-2.5 rounded-full bg-rose-100/90 hover:bg-rose-200/90 text-rose-800 font-medium text-xs sm:text-sm transition-all active:scale-95">
+          ✨ Tung mưa cánh hoa
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stage 4 Bottom Floating Toolbar (When admiring the garden) -->
+  <div id="gardenToolbar" class="fixed inset-x-0 bottom-5 z-30 flex flex-col items-center gap-2 px-4 pointer-events-none opacity-0 translate-y-6 transition-all duration-500">
+    <p class="text-xs sm:text-sm text-rose-950/80 dark:text-pink-100/90 bg-white/45 dark:bg-slate-900/50 backdrop-blur-md px-3.5 py-1 rounded-full border border-white/50 shadow-sm">
+      💡 Mẹo nhỏ: Chạm hoặc kéo chuột vào bất kỳ đâu để gieo thêm hoa & đom đóm lấp lánh!
+    </p>
+    <div class="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3.5 pointer-events-auto">
+      <button id="reopenLetterBtn" type="button"
+        class="glass-pill px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-rose-950 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+        <span>💌</span>
+        <span>Đọc lại lời chúc</span>
+      </button>
+      <button id="rebloomGardenBtn" type="button"
+        class="glass-pill px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-rose-950 hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+        <span>🌱</span>
+        <span>Cho hoa nở lại</span>
+      </button>
+      <button id="burstButterfliesBtn" type="button"
+        class="glass-pill px-4 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-rose-950 hover:scale-105 active:scale-95 transition-all flex items-center gap-1.5">
+        <span>🦋</span>
+        <span>Thả bươm bướm</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Customize Wish Modal -->
+  <div id="customizeModal" class="fixed inset-0 z-50 bg-rose-950/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+    <div class="bg-white/95 dark:bg-slate-900/95 border border-rose-200 dark:border-pink-800/50 rounded-3xl max-w-md w-full p-6 shadow-2xl text-slate-800 dark:text-pink-50">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-editorial font-bold text-2xl text-rose-900 dark:text-pink-200">
+          ✍️ Tùy chỉnh thiệp 20/10
+        </h3>
+        <button id="closeCustomizeBtn" type="button" class="w-8 h-8 rounded-full bg-rose-100 dark:bg-slate-800 text-rose-700 dark:text-pink-300 flex items-center justify-center hover:bg-rose-200">
+          ✕
+        </button>
+      </div>
+
+      <!-- Preset Selector -->
+      <div class="mb-4">
+        <label class="block text-xs font-semibold uppercase tracking-wider text-rose-700 dark:text-pink-300 mb-1.5">
+          Chọn phong cách lời chúc mẫu:
+        </label>
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" data-preset="gentle" class="preset-btn px-2.5 py-2 rounded-xl text-xs font-semibold border border-rose-300 bg-rose-50 text-rose-900 hover:bg-rose-100 transition">
+            🌸 Dịu dàng
+          </button>
+          <button type="button" data-preset="romantic" class="preset-btn px-2.5 py-2 rounded-xl text-xs font-semibold border border-rose-200 bg-white text-rose-800 hover:bg-rose-50 transition">
+            💖 Lãng mạn
+          </button>
+          <button type="button" data-preset="cheerful" class="preset-btn px-2.5 py-2 rounded-xl text-xs font-semibold border border-rose-200 bg-white text-rose-800 hover:bg-rose-50 transition">
+            ✨ Đáng yêu
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-3 text-sm">
+        <div>
+          <label for="inputRecipient" class="block text-xs font-medium text-slate-600 dark:text-pink-200/80 mb-1">Lời chào người nhận:</label>
+          <input id="inputRecipient" type="text" value="Gửi tới Hà Vi"
+            class="w-full px-3.5 py-2 rounded-xl border border-rose-200 focus:outline-none focus:ring-2 focus:ring-rose-400 bg-white text-slate-800" />
+        </div>
+        <div>
+          <label for="inputHeadline" class="block text-xs font-medium text-slate-600 dark:text-pink-200/80 mb-1">Tiêu đề chính:</label>
+          <input id="inputHeadline" type="text" value="Mong những điều dịu dàng nhất luôn nở rộ bên cậu."
+            class="w-full px-3.5 py-2 rounded-xl border border-rose-200 focus:outline-none focus:ring-2 focus:ring-rose-400 bg-white text-slate-800" />
+        </div>
+        <div>
+          <label for="inputMessage" class="block text-xs font-medium text-slate-600 dark:text-pink-200/80 mb-1">Lời chúc tâm tình:</label>
+          <textarea id="inputMessage" rows="4"
+            class="w-full px-3.5 py-2 rounded-xl border border-rose-200 focus:outline-none focus:ring-2 focus:ring-rose-400 bg-white text-slate-800">Nhân ngày Phụ nữ Việt Nam 20/10, chúc cậu luôn được yêu thương trọn vẹn, được nâng niu như những cánh hoa sớm mai và luôn giữ trong tim ngọn lửa rạng rỡ. Mong cậu đủ bình yên để mỉm cười trước những điều giản dị, và đủ kiêu hãnh để theo đuổi mọi giấc mơ của riêng mình.</textarea>
+        </div>
+        <div>
+          <label for="inputSignoff" class="block text-xs font-medium text-slate-600 dark:text-pink-200/80 mb-1">Lời kết / Ký tên:</label>
+          <input id="inputSignoff" type="text" value="Gửi ngàn lời chúc tới với bạn :333 Hà Nam"
+            class="w-full px-3.5 py-2 rounded-xl border border-rose-200 focus:outline-none focus:ring-2 focus:ring-rose-400 bg-white text-slate-800" />
+        </div>
+      </div>
+
+      <div class="mt-5 flex justify-end gap-2.5">
+        <button id="cancelCustomizeBtn" type="button" class="px-4 py-2 rounded-full text-xs font-semibold text-slate-600 hover:bg-slate-100">
+          Đóng
+        </button>
+        <button id="saveCustomizeBtn" type="button" class="px-5 py-2 rounded-full text-xs font-semibold bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-md hover:brightness-110">
+          Lưu & Xem thiệp
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const canvas = document.getElementById('gardenCanvas');
+      const ctx = canvas.getContext('2d');
+
+      // UI Elements
+      const introPrompt = document.getElementById('introPrompt');
+      const bloomStatusBanner = document.getElementById('bloomStatusBanner');
+      const letterOverlay = document.getElementById('letterOverlay');
+      const gardenToolbar = document.getElementById('gardenToolbar');
+      const themeCycleBtn = document.getElementById('themeCycleBtn');
+      const themeIcon = document.getElementById('themeIcon');
+      const themeLabel = document.getElementById('themeLabel');
+      const audioToggleBtn = document.getElementById('audioToggleBtn');
+      const audioIcon = document.getElementById('audioIcon');
+      const admireGardenBtn = document.getElementById('admireGardenBtn');
+      const sprinklePetalsBtn = document.getElementById('sprinklePetalsBtn');
+      const reopenLetterBtn = document.getElementById('reopenLetterBtn');
+      const rebloomGardenBtn = document.getElementById('rebloomGardenBtn');
+      const burstButterfliesBtn = document.getElementById('burstButterfliesBtn');
+
+      // Customize Modal Elements
+      const openCustomizeBtn = document.getElementById('openCustomizeBtn');
+      const customizeModal = document.getElementById('customizeModal');
+      const closeCustomizeBtn = document.getElementById('closeCustomizeBtn');
+      const cancelCustomizeBtn = document.getElementById('cancelCustomizeBtn');
+      const saveCustomizeBtn = document.getElementById('saveCustomizeBtn');
+      const inputRecipient = document.getElementById('inputRecipient');
+      const inputHeadline = document.getElementById('inputHeadline');
+      const inputMessage = document.getElementById('inputMessage');
+      const inputSignoff = document.getElementById('inputSignoff');
+      const cardGreeting = document.getElementById('cardGreeting');
+      const cardHeadline = document.getElementById('cardHeadline');
+      const cardPara1 = document.getElementById('cardPara1');
+      const cardPara2 = document.getElementById('cardPara2');
+      const cardPara3 = document.getElementById('cardPara3');
+      const cardSignoff = document.getElementById('cardSignoff');
+      const presetBtns = document.querySelectorAll('.preset-btn');
+
+      // Dimensions
+      let W = window.innerWidth;
+      let H = window.innerHeight;
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+      // App State: 'INTRO' -> 'BLOOMING' -> 'CARD_OPEN' -> 'ADMIRING'
+      let appState = 'INTRO';
+      let stateTimer = 0;
+      let globalTime = 0;
+
+      // Atmosphere Themes
+      const THEMES = [
+        {
+          id: 'sunset',
+          name: 'Hoàng Hôn Mộng Mơ',
+          icon: '🌅',
+          isNight: false,
+          skyStops: ['#fde2e4', '#fad2e1', '#e2ece9', '#fff1e6'],
+          cloudColor: 'rgba(255, 255, 255, 0.55)',
+          groundGlow: 'rgba(244, 162, 184, 0.25)',
+          introTextClass: 'text-rose-950'
+        },
+        {
+          id: 'morning',
+          name: 'Sương Mai Tinh Khôi',
+          icon: '☁️',
+          isNight: false,
+          skyStops: ['#cbe8f6', '#dff2fa', '#f3f8fb', '#fff9f5'],
+          cloudColor: 'rgba(255, 255, 255, 0.72)',
+          groundGlow: 'rgba(186, 230, 253, 0.3)',
+          introTextClass: 'text-slate-800'
+        },
+        {
+          id: 'starlight',
+          name: 'Đêm Đom Đóm Tinh Tú',
+          icon: '🌙',
+          isNight: true,
+          skyStops: ['#0f1026', '#1d1b3a', '#322149', '#4c2652'],
+          cloudColor: 'rgba(255, 210, 245, 0.08)',
+          groundGlow: 'rgba(236, 72, 153, 0.2)',
+          introTextClass: 'text-pink-100'
+        }
+      ];
+      // Đổi nền mặc định sang "Đêm Đom Đóm Tinh Tú" (Index 2)
+      let currentThemeIndex = 2;
+
+      // Flower Color Palettes (Rich Pastel & Vibrant Harmonies)
+      const PALETTES = [
+        { name: 'Velvet Rose', outer: '#ff8fa3', mid: '#ff4d6d', inner: '#c9184a', center: '#fff0f3' },
+        { name: 'Blush Peony', outer: '#ffc2d1', mid: '#ff8fab', inner: '#fb6f92', center: '#ffe5ec' },
+        { name: 'Peach Sunset', outer: '#ffd6a5', mid: '#ffadad', inner: '#ff758f', center: '#fff3b0' },
+        { name: 'Lavender Dream', outer: '#e0c3fc', mid: '#c8b6ff', inner: '#9d4edd', center: '#f8edeb' },
+        { name: 'Buttercup', outer: '#fdffb6', mid: '#ffca3a', inner: '#ff924c', center: '#ffffff' },
+        { name: 'Sky Blossom', outer: '#bde0fe', mid: '#a2d2ff', inner: '#5aa9e6', center: '#fff9ec' },
+        { name: 'Coral Camellia', outer: '#ffccd5', mid: '#ff758f', inner: '#d90429', center: '#ffea00' },
+        { name: 'Mint Pastel', outer: '#d8f3dc', mid: '#95d5b2', inner: '#52b788', center: '#fff8e7' },
+        { name: 'Creamy Lotus', outer: '#fff0f3', mid: '#ffccd5', inner: '#ff8fa3', center: '#ffd166' }
+      ];
+
+      // Collections
+      let heroFlower = null;
+      let gardenFlowers = [];
+      let floatingParticles = [];
+      let fallingPetals = [];
+      let butterflies = [];
+      let clouds = [];
+      let stars = [];
+      let bloomTimeoutId = null;
+
+      // Pointer interaction
+      let pointer = { x: W / 2, y: H / 2, isDown: false };
+
+      // Web Audio API Synthesizer (Gentle Music Box)
+      let audioCtx = null;
+      let isAudioMuted = false;
+      let musicIntervalId = null;
+      const MELODY_NOTES = [
+        523.25, 659.25, 783.99, 1046.50, 880.00, 783.99, 659.25,
+        587.33, 698.46, 880.00, 1174.66, 987.77, 783.99, 659.25,
+        523.25, 659.25, 783.99, 1046.50, 1318.51, 1174.66, 1046.50,
+        880.00, 783.99, 698.46, 659.25, 587.33, 523.25
+      ];
+      let noteIdx = 0;
+
+      function initAudio() {
+        if (!audioCtx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) {
+            audioCtx = new AudioContextClass();
+          }
+        }
+        if (audioCtx && audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+      }
+
+      function playChimeNote(freq, volume = 0.06, duration = 1.6) {
+        if (isAudioMuted || !audioCtx) return;
+        try {
+          const now = audioCtx.currentTime;
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now);
+
+          // Harmonic overtone for music-box sparkle
+          const osc2 = audioCtx.createOscillator();
+          const gain2 = audioCtx.createGain();
+          osc2.type = 'triangle';
+          osc2.frequency.setValueAtTime(freq * 2, now);
+
+          gain.gain.setValueAtTime(0.001, now);
+          gain.gain.exponentialRampToValueAtTime(volume, now + 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+          gain2.gain.setValueAtTime(0.001, now);
+          gain2.gain.exponentialRampToValueAtTime(volume * 0.25, now + 0.02);
+          gain2.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.5);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc2.connect(gain2);
+          gain2.connect(audioCtx.destination);
+
+          osc.start(now);
+          osc.stop(now + duration);
+          osc2.start(now);
+          osc2.stop(now + duration * 0.5);
+        } catch (e) {
+          // Ignore audio context restrictions
+        }
+      }
+
+      function startMelodyLoop() {
+        if (musicIntervalId) clearInterval(musicIntervalId);
+        musicIntervalId = setInterval(() => {
+          if (!isAudioMuted && audioCtx && appState !== 'INTRO') {
+            const freq = MELODY_NOTES[noteIdx % MELODY_NOTES.length];
+            playChimeNote(freq, 0.055, 1.9);
+            noteIdx++;
+          }
+        }, 520);
+      }
+
+      // Utility helpers
+      function rand(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function pick(arr) {
+        return arr[Math.floor(Math.random() * arr.length)];
+      }
+
+      function easeOutBack(x) {
+        const c1 = 1.70158;
+        const c3 = c1 + 1;
+        return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+      }
+
+      function easeOutCubic(x) {
+        return 1 - Math.pow(1 - x, 3);
+      }
+
+      // Resize handler
+      function resizeCanvas() {
+        W = window.innerWidth;
+        H = window.innerHeight;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = W * dpr;
+        canvas.height = H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        if (heroFlower) {
+          heroFlower.baseX = W * 0.5;
+          heroFlower.baseY = H + 20;
+          heroFlower.targetHeight = Math.min(H * 0.45, 360);
+        }
+        initBackgroundElements();
+      }
+
+      function initBackgroundElements() {
+        clouds = [];
+        for (let i = 0; i < 6; i++) {
+          clouds.push({
+            x: rand(0, W),
+            y: rand(H * 0.08, H * 0.48),
+            r: rand(60, 140),
+            speed: rand(0.12, 0.32),
+            alpha: rand(0.35, 0.75)
+          });
+        }
+
+        stars = [];
+        for (let i = 0; i < 65; i++) {
+          stars.push({
+            x: rand(0, W),
+            y: rand(0, H * 0.65),
+            r: rand(0.8, 2.2),
+            phase: rand(0, Math.PI * 2),
+            speed: rand(1.5, 3.5)
+          });
+        }
+
+        floatingParticles = [];
+        for (let i = 0; i < 40; i++) {
+          floatingParticles.push({
+            x: rand(0, W),
+            y: rand(0, H),
+            vx: rand(-0.3, 0.3),
+            vy: rand(-0.6, -0.15),
+            r: rand(2, 4.5),
+            alpha: rand(0.3, 0.85),
+            hue: rand(320, 390)
+          });
+        }
+      }
+
+      // Flower Generator
+      function createFlower(options = {}) {
+        const isHero = !!options.isHero;
+        const baseX = options.x !== undefined ? options.x : rand(W * 0.03, W * 0.97);
+        const baseY = H + rand(10, 35);
+        const depth = options.depth !== undefined ? options.depth : rand(0.35, 1.0); // 0.35 back, 1.0 front
+        const palette = isHero ? PALETTES[0] : pick(PALETTES);
+
+        // Species: 'rose' (spiral layered), 'peony' (ruffled), 'tulip' (cup), 'daisy' (starburst)
+        const speciesList = ['rose', 'rose', 'peony', 'peony', 'tulip', 'daisy'];
+        const species = isHero ? 'rose' : (options.species || pick(speciesList));
+
+        const targetHeight = isHero
+          ? Math.min(H * 0.45, 360)
+          : rand(H * 0.16, H * 0.56) * (0.55 + depth * 0.55);
+
+        const headRadius = isHero
+          ? Math.min(W, H) * 0.105 + 28
+          : rand(20, 52) * (0.55 + depth * 0.55);
+
+        const leafCount = isHero ? 4 : Math.floor(rand(2, 5));
+        const leaves = [];
+        for (let i = 0; i < leafCount; i++) {
+          leaves.push({
+            t: rand(0.28, 0.76),
+            side: i % 2 === 0 ? -1 : 1,
+            size: (isHero ? 34 : rand(16, 30)) * (0.6 + depth * 0.4),
+            angle: rand(0.35, 0.75)
+          });
+        }
+
+        return {
+          isHero,
+          species,
+          baseX,
+          baseY,
+          depth,
+          palette,
+          targetHeight,
+          headRadius,
+          stemCurve: isHero ? 12 : rand(-38, 38),
+          swaySpeed: rand(1.1, 2.1),
+          swayPhase: rand(0, Math.PI * 2),
+          swayAmount: isHero ? 8 : rand(6, 18) * depth,
+          growProgress: options.instant ? 1 : 0,
+          bloomProgress: options.instant ? 1 : 0,
+          delay: options.delay || 0,
+          growSpeed: isHero ? 0.018 : rand(0.012, 0.024),
+          bloomSpeed: isHero ? 0.022 : rand(0.014, 0.028),
+          leaves,
+          bounceVelocity: 0,
+          bounceOffset: 0,
+          rotationOffset: rand(0, Math.PI * 2),
+          headX: baseX,
+          headY: baseY - targetHeight
+        };
+      }
+
+      function setupHeroScene() {
+        appState = 'INTRO';
+        stateTimer = 0;
+        if (bloomTimeoutId) {
+          clearTimeout(bloomTimeoutId);
+          bloomTimeoutId = null;
+        }
+        gardenFlowers = [];
+        fallingPetals = [];
+        butterflies = [];
+
+        heroFlower = createFlower({
+          isHero: true,
+          x: W * 0.5,
+          depth: 1.0,
+          delay: 0
+        });
+
+        // UI state reset
+        introPrompt.classList.remove('opacity-0', '-translate-y-6');
+        bloomStatusBanner.classList.add('opacity-0', 'translate-y-4');
+        hideLetterModal();
+        gardenToolbar.classList.add('opacity-0', 'translate-y-6', 'pointer-events-none');
+      }
+
+      function triggerGardenBloom() {
+        if (appState !== 'INTRO') return;
+        initAudio();
+        playChimeNote(523.25, 0.08, 1.5);
+        setTimeout(() => playChimeNote(659.25, 0.08, 1.5), 140);
+        setTimeout(() => playChimeNote(783.99, 0.09, 1.8), 280);
+        startMelodyLoop();
+
+        appState = 'BLOOMING';
+        stateTimer = 0;
+
+        // Bounce hero flower & spawn heart sparkles
+        if (heroFlower) {
+          heroFlower.bounceVelocity = -12;
+          spawnPetalBurst(heroFlower.headX, heroFlower.headY, 24);
+        }
+
+        // Hide intro prompt, show blooming status
+        introPrompt.classList.add('opacity-0', '-translate-y-6');
+        bloomStatusBanner.classList.remove('opacity-0', 'translate-y-4');
+
+        // Generate dense multi-layered garden (75 to 110 flowers based on screen width)
+        const count = Math.min(115, Math.max(68, Math.floor(W / 13)));
+        gardenFlowers = [];
+
+        for (let i = 0; i < count; i++) {
+          const frac = i / count;
+          // Spread evenly across width with slight organic jitter
+          const xPos = W * (0.02 + frac * 0.96) + rand(-18, 18);
+          const depth = rand(0.32, 0.98);
+          const distFromCenter = Math.abs(xPos - W * 0.5) / (W * 0.5);
+          // Wave delay radiating outward from the hero flower in the center
+          const delay = distFromCenter * 1.4 + rand(0, 1.2);
+
+          gardenFlowers.push(createFlower({
+            isHero: false,
+            x: xPos,
+            depth,
+            delay
+          }));
+        }
+
+        // Sort by depth so background flowers render first, hero flower stays prominent
+        gardenFlowers.sort((a, b) => a.depth - b.depth);
+
+        // Spawn a few butterflies
+        spawnButterflies(4);
+
+        // Schedule letter card reveal after garden blooms
+        if (bloomTimeoutId) clearTimeout(bloomTimeoutId);
+        bloomTimeoutId = setTimeout(() => {
+          if (appState === 'BLOOMING') {
+            showLetterModal();
+          }
+        }, 4300);
+      }
+
+      function showLetterModal() {
+        appState = 'CARD_OPEN';
+        bloomStatusBanner.classList.add('opacity-0', 'translate-y-4');
+        gardenToolbar.classList.add('opacity-0', 'translate-y-6', 'pointer-events-none');
+
+        letterOverlay.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+        letterOverlay.classList.add('opacity-100', 'scale-100', 'pointer-events-auto');
+        spawnPetalBurst(W * 0.5, H * 0.3, 28);
+      }
+
+      function hideLetterModal() {
+        letterOverlay.classList.remove('opacity-100', 'scale-100', 'pointer-events-auto');
+        letterOverlay.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+      }
+
+      function switchToAdmireMode() {
+        appState = 'ADMIRING';
+        hideLetterModal();
+        bloomStatusBanner.classList.add('opacity-0', 'translate-y-4');
+        gardenToolbar.classList.remove('opacity-0', 'translate-y-6', 'pointer-events-none');
+      }
+
+      function spawnPetalBurst(x, y, amount = 18) {
+        for (let i = 0; i < amount; i++) {
+          const pal = pick(PALETTES);
+          const angle = rand(0, Math.PI * 2);
+          const speed = rand(1.2, 5.2);
+          fallingPetals.push({
+            x,
+            y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - rand(1, 3),
+            size: rand(5, 11),
+            rot: rand(0, Math.PI * 2),
+            vRot: rand(-0.06, 0.06),
+            color: pick([pal.outer, pal.mid, '#ffb3c6', '#ffe5ec']),
+            alpha: 1,
+            isHeart: Math.random() < 0.28
+          });
+        }
+      }
+
+      function spawnButterflies(count = 4) {
+        for (let i = 0; i < count; i++) {
+          butterflies.push({
+            x: rand(W * 0.1, W * 0.9),
+            y: H + rand(10, 60),
+            vx: rand(-1.4, 1.4),
+            vy: rand(-1.8, -0.8),
+            size: rand(10, 16),
+            wingPhase: rand(0, Math.PI * 2),
+            color: pick(['#ff8fab', '#ffd166', '#c8b6ff', '#90e0ef', '#ffadad'])
+          });
+        }
+      }
+
+      // Drawing Routines
+      function drawSkyAndAtmosphere() {
+        const theme = THEMES[currentThemeIndex];
+        const grad = ctx.createLinearGradient(0, 0, 0, H);
+        grad.addColorStop(0, theme.skyStops[0]);
+        grad.addColorStop(0.38, theme.skyStops[1]);
+        grad.addColorStop(0.72, theme.skyStops[2]);
+        grad.addColorStop(1, theme.skyStops[3]);
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, W, H);
+
+        // If starlight theme, draw twinkling stars & crescent moon
+        if (theme.isNight) {
+          ctx.save();
+          stars.forEach(s => {
+            const twinkle = 0.35 + 0.65 * Math.sin(globalTime * s.speed + s.phase);
+            ctx.fillStyle = `rgba(255, 240, 250, ${twinkle})`;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+            ctx.fill();
+          });
+
+          // Crescent Moon
+          const moonX = W * 0.82;
+          const moonY = H * 0.16;
+          ctx.fillStyle = 'rgba(255, 248, 225, 0.92)';
+          ctx.shadowColor = 'rgba(255, 215, 235, 0.6)';
+          ctx.shadowBlur = 28;
+          ctx.beginPath();
+          ctx.arc(moonX, moonY, 32, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.globalCompositeOperation = 'destination-out';
+          ctx.beginPath();
+          ctx.arc(moonX - 12, moonY - 6, 28, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        } else {
+          // Soft sun / warm glow in upper sky
+          ctx.save();
+          const sunGrad = ctx.createRadialGradient(W * 0.5, H * 0.22, 10, W * 0.5, H * 0.22, Math.max(W, H) * 0.45);
+          sunGrad.addColorStop(0, 'rgba(255, 255, 255, 0.55)');
+          sunGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.fillStyle = sunGrad;
+          ctx.fillRect(0, 0, W, H);
+          ctx.restore();
+        }
+
+        // Drifting soft clouds
+        ctx.save();
+        clouds.forEach(c => {
+          c.x += c.speed;
+          if (c.x - c.r * 2 > W) c.x = -c.r * 2;
+          const cGrad = ctx.createRadialGradient(c.x, c.y, c.r * 0.1, c.x, c.y, c.r);
+          cGrad.addColorStop(0, theme.cloudColor);
+          cGrad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+          ctx.fillStyle = cGrad;
+          ctx.beginPath();
+          ctx.ellipse(c.x, c.y, c.r * 1.5, c.r * 0.65, 0, 0, Math.PI * 2);
+          ctx.fill();
+        });
+        ctx.restore();
+      }
+
+      // Draw a single flower (stem + leaves + multi-species blossom head)
+      function updateAndDrawFlower(f, dt) {
+        if (f.delay > 0) {
+          f.delay -= dt;
+          return;
+        }
+
+        if (f.growProgress < 1) {
+          f.growProgress = Math.min(1, f.growProgress + f.growSpeed);
+        }
+        if (f.growProgress > 0.35 && f.bloomProgress < 1) {
+          f.bloomProgress = Math.min(1, f.bloomProgress + f.bloomSpeed);
+        }
+
+        // Spring bounce physics when clicked
+        f.bounceVelocity += (0 - f.bounceOffset) * 0.15;
+        f.bounceVelocity *= 0.84;
+        f.bounceOffset += f.bounceVelocity;
+
+        const gEase = easeOutCubic(f.growProgress);
+        const bEase = Math.max(0, easeOutBack(f.bloomProgress));
+
+        const sway = Math.sin(globalTime * f.swaySpeed + f.swayPhase) * f.swayAmount * gEase;
+        const currentH = f.targetHeight * gEase - f.bounceOffset;
+
+        const tipX = f.baseX + sway;
+        const tipY = f.baseY - currentH;
+        const ctrlX = f.baseX + f.stemCurve * gEase + sway * 0.45;
+        const ctrlY = f.baseY - currentH * 0.52;
+
+        f.headX = tipX;
+        f.headY = tipY;
+
+        ctx.save();
+        // Depth atmospheric opacity
+        ctx.globalAlpha = 0.55 + f.depth * 0.45;
+
+        // 1. Draw Stem
+        ctx.beginPath();
+        ctx.moveTo(f.baseX, f.baseY);
+        ctx.quadraticCurveTo(ctrlX, ctrlY, tipX, tipY);
+        const stemGrad = ctx.createLinearGradient(f.baseX, f.baseY, tipX, tipY);
+        stemGrad.addColorStop(0, '#2d6a4f');
+        stemGrad.addColorStop(0.6, '#52b788');
+        stemGrad.addColorStop(1, '#74c69d');
+        ctx.strokeStyle = stemGrad;
+        ctx.lineWidth = (f.isHero ? 5.5 : 3.2) * (0.65 + f.depth * 0.35);
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // 2. Draw Leaves along the quadratic stem
+        f.leaves.forEach(lf => {
+          if (f.growProgress < lf.t) return;
+          const leafScale = Math.min(1, (f.growProgress - lf.t) * 3.2);
+          const t = lf.t;
+          const invT = 1 - t;
+          const lx = invT * invT * f.baseX + 2 * invT * t * ctrlX + t * t * tipX;
+          const ly = invT * invT * f.baseY + 2 * invT * t * ctrlY + t * t * tipY;
+
+          ctx.save();
+          ctx.translate(lx, ly);
+          ctx.rotate(lf.side * lf.angle + sway * 0.008);
+          ctx.scale(leafScale, leafScale);
+
+          const s = lf.size;
+          ctx.fillStyle = '#52b788';
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.quadraticCurveTo(lf.side * s * 0.7, -s * 0.45, lf.side * s, -s * 0.1);
+          ctx.quadraticCurveTo(lf.side * s * 0.55, s * 0.35, 0, 0);
+          ctx.fill();
+
+          // Leaf vein
+          ctx.strokeStyle = 'rgba(216, 243, 220, 0.55)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(lf.side * s * 0.75, -s * 0.08);
+          ctx.stroke();
+          ctx.restore();
+        });
+
+        // 3. Draw Blossom Head
+        if (f.bloomProgress > 0.01) {
+          const R = f.headRadius * Math.max(0.05, bEase);
+          ctx.save();
+          ctx.translate(tipX, tipY);
+          ctx.rotate(sway * 0.012);
+
+          // Soft ambient glow behind hero or night flowers
+          if (f.isHero || THEMES[currentThemeIndex].isNight) {
+            const glowR = R * 1.45;
+            const glow = ctx.createRadialGradient(0, 0, R * 0.2, 0, 0, glowR);
+            glow.addColorStop(0, f.palette.outer + '66');
+            glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            ctx.fillStyle = glow;
+            ctx.beginPath();
+            ctx.arc(0, 0, glowR, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          if (f.species === 'rose') {
+            drawSpiralRoseHead(R, f.palette, f.rotationOffset);
+          } else if (f.species === 'peony') {
+            drawPeonyHead(R, f.palette, f.rotationOffset);
+          } else if (f.species === 'tulip') {
+            drawTulipHead(R, f.palette);
+          } else {
+            drawDaisyHead(R, f.palette, f.rotationOffset);
+          }
+
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+
+      // Lush Spiral Rose (Inspired by the video's signature layered spiral roses, enhanced with soft petal gradients)
+      function drawSpiralRoseHead(R, pal, rotOffset) {
+        // Base soft outer halo disc
+        const baseGrad = ctx.createRadialGradient(0, 0, R * 0.1, 0, 0, R);
+        baseGrad.addColorStop(0, pal.inner);
+        baseGrad.addColorStop(0.55, pal.mid);
+        baseGrad.addColorStop(1, pal.outer);
+        ctx.fillStyle = baseGrad;
+        ctx.beginPath();
+        ctx.arc(0, 0, R * 0.94, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Concentric scalloped petal rings from outside to inside
+        const rings = 5;
+        for (let ring = rings; ring >= 1; ring--) {
+          const frac = ring / rings;
+          const ringR = R * (0.18 + frac * 0.82);
+          const petalCount = 5 + ring * 2;
+          const angleStep = (Math.PI * 2) / petalCount;
+
+          for (let i = 0; i < petalCount; i++) {
+            const a = i * angleStep + ring * 0.55 + rotOffset;
+            const px = Math.cos(a) * ringR * 0.52;
+            const py = Math.sin(a) * ringR * 0.52;
+
+            ctx.save();
+            ctx.translate(px, py);
+            ctx.rotate(a + Math.PI / 2);
+
+            const pGrad = ctx.createRadialGradient(0, -ringR * 0.1, 1, 0, 0, ringR * 0.65);
+            if (ring >= 4) {
+              pGrad.addColorStop(0, pal.mid);
+              pGrad.addColorStop(1, pal.outer);
+            } else if (ring >= 2) {
+              pGrad.addColorStop(0, pal.inner);
+              pGrad.addColorStop(1, pal.mid);
+            } else {
+              pGrad.addColorStop(0, pal.center);
+              pGrad.addColorStop(1, pal.inner);
+            }
+
+            ctx.fillStyle = pGrad;
+            ctx.beginPath();
+            ctx.ellipse(0, 0, ringR * 0.48, ringR * 0.34, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Delicate white-pink rim highlight on each petal
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.38)';
+            ctx.lineWidth = 1.1;
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+
+        // Inner spiral swirl
+        ctx.fillStyle = pal.center;
+        ctx.beginPath();
+        ctx.arc(0, 0, R * 0.14, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Ruffled Peony Blossom
+      function drawPeonyHead(R, pal, rotOffset) {
+        const layers = 3;
+        for (let l = layers; l >= 1; l--) {
+          const count = 8 + l * 3;
+          const layerR = R * (0.4 + (l / layers) * 0.6);
+          for (let i = 0; i < count; i++) {
+            const a = (i / count) * Math.PI * 2 + l * 0.4 + rotOffset;
+            ctx.save();
+            ctx.rotate(a);
+            ctx.fillStyle = l === 3 ? pal.outer : l === 2 ? pal.mid : pal.inner;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.bezierCurveTo(-layerR * 0.35, -layerR * 0.6, -layerR * 0.25, -layerR, 0, -layerR * 0.95);
+            ctx.bezierCurveTo(layerR * 0.25, -layerR, layerR * 0.35, -layerR * 0.6, 0, 0);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+            ctx.lineWidth = 0.9;
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+        // Golden stamen center
+        ctx.fillStyle = '#ffd166';
+        ctx.beginPath();
+        ctx.arc(0, 0, R * 0.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Graceful Tulip / Lotus Cup
+      function drawTulipHead(R, pal) {
+        // Back petals
+        const petals = [-0.42, 0.42, -0.2, 0.2, 0];
+        petals.forEach((angle, idx) => {
+          ctx.save();
+          ctx.rotate(angle);
+          ctx.fillStyle = idx < 2 ? pal.inner : idx < 4 ? pal.mid : pal.outer;
+          ctx.beginPath();
+          ctx.ellipse(0, -R * 0.38, R * 0.38, R * 0.62, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+          ctx.restore();
+        });
+      }
+
+      // Starburst Cosmos / Daisy
+      function drawDaisyHead(R, pal, rotOffset) {
+        const count = 12;
+        for (let i = 0; i < count; i++) {
+          const a = (i / count) * Math.PI * 2 + rotOffset;
+          ctx.save();
+          ctx.rotate(a);
+          ctx.fillStyle = i % 2 === 0 ? pal.outer : pal.mid;
+          ctx.beginPath();
+          ctx.ellipse(0, -R * 0.55, R * 0.19, R * 0.45, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        ctx.fillStyle = '#ffca3a';
+        ctx.beginPath();
+        ctx.arc(0, 0, R * 0.24, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Draw Floating Sparkles / Fireflies & Falling Petals
+      function updateAndDrawParticles() {
+        const isNight = THEMES[currentThemeIndex].isNight;
+
+        // Ambient floating fireflies / light motes
+        floatingParticles.forEach(p => {
+          p.x += p.vx + Math.sin(globalTime + p.y * 0.02) * 0.25;
+          p.y += p.vy;
+          if (p.y < -10) {
+            p.y = H + 10;
+            p.x = rand(0, W);
+          }
+          if (p.x < -10) p.x = W + 10;
+          if (p.x > W + 10) p.x = -10;
+
+          const glowAlpha = p.alpha * (0.55 + 0.45 * Math.sin(globalTime * 2.5 + p.x));
+          ctx.save();
+          ctx.fillStyle = isNight
+            ? `rgba(254, 240, 138, ${glowAlpha})`
+            : `rgba(255, 255, 255, ${glowAlpha})`;
+          if (isNight) {
+            ctx.shadowColor = '#fde047';
+            ctx.shadowBlur = 10;
+          }
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+
+        // Falling petals & hearts
+        for (let i = fallingPetals.length - 1; i >= 0; i--) {
+          const pt = fallingPetals[i];
+          pt.x += pt.vx + Math.sin(globalTime * 2 + pt.rot) * 0.4;
+          pt.y += pt.vy;
+          pt.vy += 0.045; // gentle gravity
+          pt.rot += pt.vRot;
+          pt.alpha -= 0.006;
+
+          if (pt.alpha <= 0 || pt.y > H + 30) {
+            fallingPetals.splice(i, 1);
+            continue;
+          }
+
+          ctx.save();
+          ctx.translate(pt.x, pt.y);
+          ctx.rotate(pt.rot);
+          ctx.globalAlpha = Math.max(0, pt.alpha);
+          ctx.fillStyle = pt.color;
+
+          if (pt.isHeart) {
+            const s = pt.size * 0.9;
+            ctx.beginPath();
+            ctx.moveTo(0, s * 0.3);
+            ctx.bezierCurveTo(-s, -s * 0.5, -s * 0.5, -s * 1.2, 0, -s * 0.4);
+            ctx.bezierCurveTo(s * 0.5, -s * 1.2, s, -s * 0.5, 0, s * 0.3);
+            ctx.fill();
+          } else {
+            ctx.beginPath();
+            ctx.ellipse(0, 0, pt.size, pt.size * 0.6, 0, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+
+        // Butterflies
+        for (let i = butterflies.length - 1; i >= 0; i--) {
+          const b = butterflies[i];
+          b.wingPhase += 0.22;
+          b.x += b.vx + Math.sin(globalTime * 1.8 + i) * 0.9;
+          b.y += b.vy + Math.cos(globalTime * 1.4 + i) * 0.4;
+
+          if (b.y < -40 || b.x < -60 || b.x > W + 60) {
+            butterflies.splice(i, 1);
+            continue;
+          }
+
+          const wingFlap = Math.abs(Math.sin(b.wingPhase));
+          ctx.save();
+          ctx.translate(b.x, b.y);
+          ctx.rotate(b.vx * 0.25);
+          ctx.fillStyle = b.color;
+          ctx.globalAlpha = 0.88;
+
+          // Left & Right wings
+          ctx.beginPath();
+          ctx.ellipse(-b.size * 0.45 * wingFlap, -b.size * 0.2, b.size * 0.7 * wingFlap, b.size * 0.45, -0.4, 0, Math.PI * 2);
+          ctx.ellipse(b.size * 0.45 * wingFlap, -b.size * 0.2, b.size * 0.7 * wingFlap, b.size * 0.45, 0.4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      // Main Animation Loop
+      let lastTime = performance.now();
+      function animate(now) {
+        const dt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+        globalTime += dt;
+        stateTimer += dt;
+
+        drawSkyAndAtmosphere();
+
+        // Draw background & mid-ground garden flowers
+        for (let i = 0; i < gardenFlowers.length; i++) {
+          if (gardenFlowers[i].depth <= 0.85) {
+            updateAndDrawFlower(gardenFlowers[i], dt);
+          }
+        }
+
+        // Draw the central Hero Flower prominently
+        if (heroFlower) {
+          updateAndDrawFlower(heroFlower, dt);
+
+          // Draw subtle pulsing halo around hero flower when in INTRO state
+          if (appState === 'INTRO' && heroFlower.bloomProgress >= 0.9) {
+            const pulse = 1 + 0.14 * Math.sin(globalTime * 3.2);
+            ctx.save();
+            ctx.strokeStyle = 'rgba(244, 63, 94, 0.35)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(heroFlower.headX, heroFlower.headY, heroFlower.headRadius * 1.15 * pulse, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+
+        // Draw foreground garden flowers
+        for (let i = 0; i < gardenFlowers.length; i++) {
+          if (gardenFlowers[i].depth > 0.85) {
+            updateAndDrawFlower(gardenFlowers[i], dt);
+          }
+        }
+
+        // Bottom soft mist glow
+        const mistGrad = ctx.createLinearGradient(0, H - 90, 0, H);
+        mistGrad.addColorStop(0, 'rgba(255, 255, 255, 0)');
+        mistGrad.addColorStop(1, THEMES[currentThemeIndex].groundGlow);
+        ctx.fillStyle = mistGrad;
+        ctx.fillRect(0, H - 90, W, 90);
+
+        updateAndDrawParticles();
+
+        requestAnimationFrame(animate);
+      }
+
+      // Canvas Click / Tap Interaction
+      function handleCanvasTap(clientX, clientY) {
+        pointer.x = clientX;
+        pointer.y = clientY;
+
+        if (appState === 'INTRO') {
+          // Clicking anywhere near the hero flower (or anywhere on canvas in intro) wakes up the garden
+          triggerGardenBloom();
+          return;
+        }
+
+        // In BLOOMING or ADMIRING mode: check if user tapped an existing flower head
+        let hitFlower = false;
+        const allFlowers = heroFlower ? [heroFlower, ...gardenFlowers] : gardenFlowers;
+        for (let i = allFlowers.length - 1; i >= 0; i--) {
+          const fl = allFlowers[i];
+          if (fl.bloomProgress < 0.5) continue;
+          const dx = clientX - fl.headX;
+          const dy = clientY - fl.headY;
+          if (dx * dx + dy * dy <= (fl.headRadius * 1.2) * (fl.headRadius * 1.2)) {
+            fl.bounceVelocity = -10;
+            spawnPetalBurst(fl.headX, fl.headY, 14);
+            initAudio();
+            playChimeNote(pick(MELODY_NOTES), 0.06, 1.2);
+            hitFlower = true;
+            break;
+          }
+        }
+
+        // If user tapped open sky in ADMIRING mode, plant a new flower at that horizontal position & burst petals
+        if (!hitFlower && appState === 'ADMIRING') {
+          spawnPetalBurst(clientX, clientY, 12);
+          initAudio();
+          playChimeNote(pick(MELODY_NOTES), 0.05, 1.1);
+          if (gardenFlowers.length < 160) {
+            const newFl = createFlower({
+              isHero: false,
+              x: clientX,
+              depth: rand(0.65, 0.98),
+              delay: 0
+            });
+            newFl.targetHeight = Math.max(80, H - clientY);
+            gardenFlowers.push(newFl);
+          }
+        }
+      }
+
+      canvas.addEventListener('pointerdown', (e) => {
+        pointer.isDown = true;
+        handleCanvasTap(e.clientX, e.clientY);
+      });
+
+      canvas.addEventListener('pointermove', (e) => {
+        if (pointer.isDown && appState === 'ADMIRING' && Math.random() < 0.25) {
+          spawnPetalBurst(e.clientX, e.clientY, 2);
+        }
+      });
+
+      window.addEventListener('pointerup', () => {
+        pointer.isDown = false;
+      });
+
+      // UI Button Listeners
+      admireGardenBtn.addEventListener('click', () => {
+        initAudio();
+        playChimeNote(783.99, 0.06, 1.2);
+        switchToAdmireMode();
+      });
+
+      sprinklePetalsBtn.addEventListener('click', () => {
+        initAudio();
+        playChimeNote(1046.50, 0.07, 1.5);
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            spawnPetalBurst(rand(W * 0.2, W * 0.8), rand(H * 0.1, H * 0.4), 16);
+          }, i * 130);
+        }
+      });
+
+      reopenLetterBtn.addEventListener('click', () => {
+        initAudio();
+        playChimeNote(659.25, 0.06, 1.2);
+        showLetterModal();
+      });
+
+      rebloomGardenBtn.addEventListener('click', () => {
+        initAudio();
+        playChimeNote(523.25, 0.06, 1.2);
+        setupHeroScene();
+        setTimeout(() => {
+          triggerGardenBloom();
+        }, 350);
+      });
+
+      burstButterfliesBtn.addEventListener('click', () => {
+        initAudio();
+        playChimeNote(880.00, 0.06, 1.3);
+        spawnButterflies(7);
+        spawnPetalBurst(W * 0.5, H * 0.6, 18);
+      });
+
+      // Theme Switcher
+      function applyThemeUI() {
+        const theme = THEMES[currentThemeIndex];
+        themeIcon.textContent = theme.icon;
+        themeLabel.textContent = theme.name;
+
+        const introTitle = document.getElementById('introTitle');
+        const headerTagline = document.getElementById('headerTagline');
+        if (theme.isNight) {
+          document.body.classList.add('theme-night', 'dark');
+          introTitle.className = 'font-editorial italic font-semibold text-3xl sm:text-5xl md:text-6xl text-pink-100 drop-shadow-md tracking-tight mb-2.5 animate-float';
+          headerTagline.className = 'font-editorial italic text-base sm:text-lg font-semibold tracking-wide text-pink-100';
+        } else {
+          document.body.classList.remove('theme-night', 'dark');
+          introTitle.className = 'font-editorial italic font-semibold text-3xl sm:text-5xl md:text-6xl text-rose-950 drop-shadow-sm tracking-tight mb-2.5 animate-float';
+          headerTagline.className = 'font-editorial italic text-base sm:text-lg font-semibold tracking-wide text-rose-950';
+        }
+      }
+
+      themeCycleBtn.addEventListener('click', () => {
+        currentThemeIndex = (currentThemeIndex + 1) % THEMES.length;
+        applyThemeUI();
+        initAudio();
+        playChimeNote(783.99, 0.05, 1.0);
+      });
+
+      // Audio Mute Toggle
+      audioToggleBtn.addEventListener('click', () => {
+        initAudio();
+        isAudioMuted = !isAudioMuted;
+        audioIcon.textContent = isAudioMuted ? '🔇' : '🎵';
+        if (!isAudioMuted) {
+          playChimeNote(659.25, 0.06, 1.2);
+        }
+      });
+
+      // Customize Wish Modal Logic
+      const PRESETS = {
+        gentle: {
+          recipient: 'Gửi người con gái tuyệt vời,',
+          headline: 'Mong những điều dịu dàng nhất luôn nở rộ bên bạn.',
+          message: 'Nhân ngày Phụ nữ Việt Nam 20/10, chúc bạn luôn được yêu thương trọn vẹn, được nâng niu như những cánh hoa sớm mai và luôn giữ trong tim ngọn lửa rạng rỡ. Mong bạn đủ bình yên để mỉm cười trước những điều giản dị, và đủ kiêu hãnh để theo đuổi mọi giấc mơ của riêng mình.',
+          signoff: 'Gửi ngàn thương mến đến bạn ♡'
+        },
+        romantic: {
+          recipient: 'Gửi em — đóa hoa đẹp nhất trong lòng anh,',
+          headline: 'Cảm ơn em vì đã đến và làm thế giới của anh dịu dàng hơn.',
+          message: 'Một bông hoa có thể làm ngày mới thêm tươi, nhưng chính nụ cười của em mới là nắng ấm làm tan mọi mệt nhoài. Chúc công chúa của anh ngày 20/10 và cả 365 ngày trong năm luôn ngập tràn hạnh phúc, bình yên và mãi rạng ngời trong vòng tay yêu thương.',
+          signoff: 'Thương em thật nhiều ♡'
+        },
+        cheerful: {
+          recipient: 'Gửi các chị em xinh đẹp & tỏa sáng,',
+          headline: 'Chúc một nửa thế giới ngày 20/10 rực rỡ như vườn hoa!',
+          message: 'Chúc bạn ngày 20/10 nhan sắc thăng hạng, tiền tài đầy túi, tình duyên phơi phới và niềm vui ngập tràn! Dù bận rộn đến đâu cũng đừng quên yêu thương bản thân và luôn tự tin tỏa sáng theo phiên bản rực rỡ nhất của chính mình nhé.',
+          signoff: 'Chúc mừng ngày 20/10 rực rỡ ✨'
+        }
+      };
+
+      presetBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.getAttribute('data-preset');
+          const p = PRESETS[key];
+          if (!p) return;
+          inputRecipient.value = p.recipient;
+          inputHeadline.value = p.headline;
+          inputMessage.value = p.message;
+          inputSignoff.value = p.signoff;
+          presetBtns.forEach(b => b.classList.remove('bg-rose-50', 'border-rose-300'));
+          btn.classList.add('bg-rose-50', 'border-rose-300');
+        });
+      });
+
+      openCustomizeBtn.addEventListener('click', () => {
+        customizeModal.classList.remove('hidden');
+      });
+
+      function closeCustomize() {
+        customizeModal.classList.add('hidden');
+      }
+
+      closeCustomizeBtn.addEventListener('click', closeCustomize);
+      cancelCustomizeBtn.addEventListener('click', closeCustomize);
+
+      saveCustomizeBtn.addEventListener('click', () => {
+        cardGreeting.textContent = inputRecipient.value.trim() || 'Gửi bạn thương mến,';
+        cardHeadline.textContent = inputHeadline.value.trim() || 'Mong những điều đẹp đẽ luôn nở bên bạn.';
+        cardPara2.textContent = inputMessage.value.trim() || '';
+        cardSignoff.textContent = inputSignoff.value.trim() || 'Gửi ngàn thương mến ♡';
+        closeCustomize();
+        if (appState === 'INTRO') {
+          triggerGardenBloom();
+        } else {
+          showLetterModal();
+        }
+      });
+
+      // Initialize & Start
+      window.addEventListener('resize', resizeCanvas);
+      window.onload = function () {
+        resizeCanvas();
+        applyThemeUI();
+        setupHeroScene();
+        requestAnimationFrame(animate);
+      };
+    })();
+  </script>
+</body>
+</html>
